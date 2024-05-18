@@ -1,4 +1,19 @@
 import streamlit as st
+import requests
+from bs4 import BeautifulSoup
+from langchain_upstage import ChatUpstage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+
+# Function to fetch and parse text from a URL
+def get_text_from_url(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        return soup.get_text(separator=' ', strip=True)
+    except requests.exceptions.RequestException as e:
+        return f"Error fetching the URL: {e}"
 
 # Set the title of the web interface
 st.title("취준생을 위한 자기소개서 상담사 AI")
@@ -29,10 +44,6 @@ constraints_1 = st.text_input("4.1. 채용공고 문서 URL", key="constraints_1
 constraints_2 = st.text_input("4.2. 문항별 최대 글자수", key="constraints_2")
 
 # Prompt
-from langchain_upstage import ChatUpstage
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import PromptTemplate
-
 llm = ChatUpstage()
 prompt_template = PromptTemplate.from_template(
     """
@@ -53,15 +64,34 @@ prompt_template = PromptTemplate.from_template(
     채용공고는 다음과 같습니다. "{constraints_1}":
     다음 질문에 대해서 자기소개서를 작성해주세요 "{self_intro_question_lists}":
     최대글자수는 "{constraints_2}" 입니다
-    "
     ---
     """
 )
-chain = prompt_template | llm | StrOutputParser()
-answer = chain.invoke({"cominfo_1": cominfo_1, "cominfo_2": cominfo_2, "cominfo_3": cominfo_3, "myinfo_1": myinfo_1, "myinfo_2": myinfo_3, "myinfo_3": myinfo_3, "myinfo_4": myinfo_4, "myinfo_5": myinfo_5, "myinfo_6": myinfo_6, "myinfo_7": myinfo_7, "constraints_1": constraints_2, "constraints_2": constraints_2, "self_intro_question_lists": self_intro_question_lists })
 
 # Button to generate the output
 if st.button("Generate 자기소개서"):
+    # Fetch and display the text from the company info URL
+    if cominfo_2:
+        cominfo_2_text = get_text_from_url(cominfo_2)
+    else:
+        cominfo_2_text = ""
+
+    chain = prompt_template | llm | StrOutputParser()
+    answer = chain.invoke({
+        "cominfo_1": cominfo_1, 
+        "cominfo_2": cominfo_2_text, 
+        "cominfo_3": cominfo_3, 
+        "myinfo_1": myinfo_1, 
+        "myinfo_2": myinfo_2, 
+        "myinfo_3": myinfo_3, 
+        "myinfo_4": myinfo_4, 
+        "myinfo_5": myinfo_5, 
+        "myinfo_6": myinfo_6, 
+        "myinfo_7": myinfo_7, 
+        "constraints_1": constraints_1, 
+        "constraints_2": constraints_2, 
+        "self_intro_question_lists": self_intro_question_lists
+    })
     
     # Placeholder for the output
     st.header("자기소개서")
