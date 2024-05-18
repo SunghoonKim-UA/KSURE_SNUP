@@ -1,5 +1,3 @@
-# streamlit run SolarSelfNovel.py
-
 import streamlit as st
 
 # Set the title of the web interface
@@ -27,7 +25,7 @@ myinfo_7 = st.text_area("3.7. 이전 회사 퇴사 사유", key="myinfo_7")
 
 # Section 4: 제약사항
 st.header("4. 제약사항")
-constraints_1 = st.file_uploader("4.1. 채용공고 파일", type=["pdf", "docx", "txt"], key="constraints_1")
+constraints_1 = st.file_uploader("4.1. 채용공고 파일", type=["pdf", "txt"], key="constraints_1")
 constraints_2 = st.text_input("4.2. 문항별 최대 글자수", key="constraints_2")
 
 # Button to generate the output
