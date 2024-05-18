@@ -6,6 +6,8 @@ from langchain_upstage import ChatUpstage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 
+import GetCompanyInfo as gci
+
 # Function to fetch and parse text from a URL
 def get_text_from_url(url):
     try:
@@ -65,9 +67,10 @@ st.title("취준생을 위한 자기소개서 상담사 AI")
 
 # Section 1: 회사 정보
 st.header("1. 회사 정보")
-cominfo_1 = st.text_area("1.1. 신년사", key="cominfo_1")
-cominfo_2 = st.text_input("1.2. 회사 소개 URL", key="cominfo_2")
-cominfo_3 = st.text_input("1.3. 회사 인재상 URL", key="cominfo_3")
+cominfo_0 = st.text_input("1.0. 회사명", key="cominfo_0")
+cominfo_1 = st.text_area("1.1. 신년사 (미 입력 시, 회사명 기준으로 웹검색결과 적용)", key="cominfo_1")
+cominfo_2 = st.text_input("1.2. 회사 소개 URL (미 입력 시, 회사명 기준으로 웹검색결과 적용)", key="cominfo_2")
+cominfo_3 = st.text_input("1.3. 회사 인재상 URL (미 입력 시, 회사명 기준으로 웹검색결과 적용)", key="cominfo_3")
 
 # Section 2: 자기소개서 질문 목록
 st.header("2. 자기소개서 질문 목록")
@@ -145,11 +148,14 @@ if st.button("Generate 자기소개서"):
 
     url_contents = fetch_and_display_url_content(urls)
 
+    year_greeting, comp_intro, comp_membership = gci.get_company_info(cominfo_0)
+
+
     chain = prompt_template | llm | StrOutputParser()
     answer = chain.invoke({
-        "cominfo_1": cominfo_1, 
-        "cominfo_2": url_contents["cominfo_2"], 
-        "cominfo_3": url_contents["cominfo_3"], 
+        "cominfo_1": year_greeting if cominfo_1 == "" else cominfo_1, 
+        "cominfo_2": comp_intro if cominfo_2 == "" else url_contents["cominfo_2"], 
+        "cominfo_3": comp_membership if cominfo_3 == "" else url_contents["cominfo_3"], 
         "myinfo_1": myinfo_1, 
         "myinfo_2": myinfo_2, 
         "myinfo_3": myinfo_3, 
@@ -161,9 +167,12 @@ if st.button("Generate 자기소개서"):
     
     # Save inputs and output to database
     data = {
-        "cominfo_1": cominfo_1,
-        "cominfo_2": url_contents["cominfo_2"],
-        "cominfo_3": url_contents["cominfo_3"],
+#        "cominfo_1": cominfo_1,
+#        "cominfo_2": url_contents["cominfo_2"],
+#        "cominfo_3": url_contents["cominfo_3"],
+        "cominfo_1": ",".join(str(element) for element in year_greeting) if cominfo_1 == "" else cominfo_1, 
+        "cominfo_2": ",".join(str(element) for element in comp_intro) if cominfo_2 == "" else url_contents["cominfo_2"], 
+        "cominfo_3": ",".join(str(element) for element in comp_membership) if cominfo_3 == "" else url_contents["cominfo_3"], 
         "self_intro_question_lists": self_intro_question_lists,
         "myinfo_1": myinfo_1,
         "myinfo_2": myinfo_2,
