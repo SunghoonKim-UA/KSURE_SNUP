@@ -1,10 +1,13 @@
+from tavily import TavilyClient
+from datetime import date
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 ## input : 회사이름
 ## output : 신년사, 회사소개, 인재상
 def get_company_info(company_name):
-    import os
-    from tavily import TavilyClient
-    from datetime import date
-
     client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
 
     ## 신년사
