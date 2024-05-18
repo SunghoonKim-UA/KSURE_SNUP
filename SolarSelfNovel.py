@@ -29,10 +29,42 @@ st.header("4. 제약사항")
 constraints_1 = st.text_input("4.1. 채용공고 문서 URL", key="constraints_1")
 constraints_2 = st.text_input("4.2. 문항별 최대 글자수", key="constraints_2")
 
+# Prompt
+from langchain_upstage import ChatUpstage
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+
+llm = ChatUpstage()
+prompt_template = PromptTemplate.from_template(
+    """
+    나는 취업준비생을 위해서 자기소개서를 작성해주는 상담사입니다. 
+    다음 회사에 대해서 자기소개서를 작성해주세요
+    회사의 신년사는 다음과 같습니다. "{cominfo_1}":
+    회사 소개는 다음과 같습니다. "{cominfo_2}":
+    회사 인재상은 다음과 같습니다. "{cominfo_3}":
+    내 정보는 다음과 같습니다.
+    내 학력은 다음과 같습니다. "{myinfo_1}":
+    내 경력은 다음과 같습니다. "{myinfo_2}":
+    내 공인영어성적은 다음과 같습니다. "{myinfo_3}":
+    내 자격증은 다음과 같습니다. "{myinfo_4}":
+    내 우대사항은 다음과 같습니다. "{myinfo_5}":
+    나를 표현하는 사건은 다음과 같습니다. "{myinfo_6}":
+    이전 회사 퇴사 사유는 다음과 같습니다. "{myinfo_7}":
+    다음 제약사항을 참고해서 작성해줘
+    채용공고는 다음과 같습니다. "{constraints_1}":
+    다음 질문에 대해서 자기소개서를 작성해주세요 "{self_intro_question_lists}":
+    최대글자수는 "{constraints_2}" 입니다
+    "
+    ---
+    """
+)
+chain = prompt_template | llm | StrOutputParser()
+answer = chain.invoke({"cominfo_1": cominfo_1, "cominfo_2": cominfo_2, "cominfo_3": cominfo_3, "myinfo_1": myinfo_1, "myinfo_2": myinfo_3, "myinfo_3": myinfo_3, "myinfo_4": myinfo_4, "myinfo_5": myinfo_5, "myinfo_6": myinfo_6, "myinfo_7": myinfo_7, "constraints_1": constraints_2, "constraints_2": constraints_2, "self_intro_question_lists": self_intro_question_lists })
+
 # Button to generate the output
 if st.button("Generate 자기소개서"):
     
     
     # Placeholder for the output
     st.header("자기소개서")
-    st.write("Generated 자기소개서 will be displayed here.")
+    st.write(answer)
