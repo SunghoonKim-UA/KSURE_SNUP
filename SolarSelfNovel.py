@@ -11,6 +11,9 @@ def get_text_from_url(url):
         response = requests.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
+        print("----------------")
+        print(soup.get_text(separator=' ', strip=True))
+        print("----------------")
         return soup.get_text(separator=' ', strip=True)
     except requests.exceptions.RequestException as e:
         return f"Error fetching the URL: {e}"
@@ -68,19 +71,30 @@ prompt_template = PromptTemplate.from_template(
     """
 )
 
+def fetch_and_display_url_content(urls):
+    content_dict = {}
+    for key, url in urls.items():
+        if url:
+            content_dict[key] = get_text_from_url(url)
+        else:
+            content_dict[key] = ""
+    return content_dict
+
 # Button to generate the output
 if st.button("Generate 자기소개서"):
-    # Fetch and display the text from the company info URL
-    if cominfo_2:
-        cominfo_2_text = get_text_from_url(cominfo_2)
-    else:
-        cominfo_2_text = ""
+    urls = {
+        "cominfo_2": cominfo_2,
+        "cominfo_3": cominfo_3,
+        "constraints_1": constraints_1
+    }
+
+    url_contents = fetch_and_display_url_content(urls)
 
     chain = prompt_template | llm | StrOutputParser()
     answer = chain.invoke({
         "cominfo_1": cominfo_1, 
-        "cominfo_2": cominfo_2_text, 
-        "cominfo_3": cominfo_3, 
+        "cominfo_2": url_contents["cominfo_2"], 
+        "cominfo_3": url_contents["cominfo_3"], 
         "myinfo_1": myinfo_1, 
         "myinfo_2": myinfo_2, 
         "myinfo_3": myinfo_3, 
@@ -88,7 +102,7 @@ if st.button("Generate 자기소개서"):
         "myinfo_5": myinfo_5, 
         "myinfo_6": myinfo_6, 
         "myinfo_7": myinfo_7, 
-        "constraints_1": constraints_1, 
+        "constraints_1": url_contents["constraints_1"], 
         "constraints_2": constraints_2, 
         "self_intro_question_lists": self_intro_question_lists
     })
