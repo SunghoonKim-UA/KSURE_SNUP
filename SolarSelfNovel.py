@@ -1,3 +1,4 @@
+import PyPDF2
 import streamlit as st
 
 # Set the title of the web interface
