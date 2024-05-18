@@ -5,8 +5,10 @@ import sqlite3
 from langchain_upstage import ChatUpstage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
-
+from dotenv import load_dotenv
 import GetCompanyInfo as gci
+
+load_dotenv()
 
 # Function to fetch and parse text from a URL
 def get_text_from_url(url):
@@ -167,9 +169,6 @@ if st.button("Generate 자기소개서"):
     
     # Save inputs and output to database
     data = {
-#        "cominfo_1": cominfo_1,
-#        "cominfo_2": url_contents["cominfo_2"],
-#        "cominfo_3": url_contents["cominfo_3"],
         "cominfo_1": ",".join(str(element) for element in year_greeting) if cominfo_1 == "" else cominfo_1, 
         "cominfo_2": ",".join(str(element) for element in comp_intro) if cominfo_2 == "" else url_contents["cominfo_2"], 
         "cominfo_3": ",".join(str(element) for element in comp_membership) if cominfo_3 == "" else url_contents["cominfo_3"], 
