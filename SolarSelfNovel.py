@@ -48,6 +48,15 @@ def save_to_db(data):
     conn.commit()
     conn.close()
 
+# Function to fetch data from the SQLite database
+def fetch_from_db():
+    conn = sqlite3.connect('inputs_outputs.db')
+    c = conn.cursor()
+    c.execute('''SELECT * FROM data''')
+    rows = c.fetchall()
+    conn.close()
+    return rows
+
 # Initialize the database
 init_db()
 
@@ -167,3 +176,40 @@ if st.button("Generate 자기소개서"):
     # Placeholder for the output
     st.header("자기소개서")
     st.write(answer)
+    
+    # Display the inputs and the generated output
+    st.header("입력 정보 및 생성된 자기소개서")
+    st.subheader("회사 정보")
+    st.write("신년사:", cominfo_1)
+    st.write("회사 소개 URL:", cominfo_2)
+    st.write("회사 인재상 URL:", cominfo_3)
+    st.subheader("자기소개서 질문 목록")
+    st.write(self_intro_question_lists)
+    st.subheader("내 정보")
+    st.write("전공:", myinfo_1)
+    st.write("경력:", myinfo_2)
+    st.write("자격증:", myinfo_3)
+    st.write("나를 표현하는 사건:", myinfo_4)
+    st.subheader("제약사항")
+    st.write("채용공고 문서 URL:", constraints_1)
+    st.write("문항별 최대 글자수:", constraints_2)
+    st.header("생성된 자기소개서")
+    st.write(answer)
+
+    # Fetch and display data from the database
+    st.header("저장된 데이터베이스 내용")
+    rows = fetch_from_db()
+    for row in rows:
+        st.write("ID:", row[0])
+        st.write("신년사:", row[1])
+        st.write("회사 소개 URL:", row[2])
+        st.write("회사 인재상 URL:", row[3])
+        st.write("자기소개서 질문 목록:", row[4])
+        st.write("전공:", row[5])
+        st.write("경력:", row[6])
+        st.write("자격증:", row[7])
+        st.write("나를 표현하는 사건:", row[8])
+        st.write("채용공고 문서 URL:", row[9])
+        st.write("문항별 최대 글자수:", row[10])
+        st.write("생성된 자기소개서:", row[11])
+        st.write("---")
