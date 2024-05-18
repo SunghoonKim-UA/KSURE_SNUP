@@ -15,7 +15,7 @@ self_intro_question_lists = st.text_area("자기소개서 질문 목록", key="s
 
 # Section 3: 내 정보
 st.header("3. 내 정보")
-myinfo_1 = st.text_area("3.1. 학력", key="myinfo_1")
+myinfo_1 = st.text_area("3.1. 전공", key="myinfo_1")
 myinfo_2 = st.text_area("3.2. 경력", key="myinfo_2")
 myinfo_3 = st.text_input("3.3. 공인영어성적", key="myinfo_3")
 myinfo_4 = st.text_input("3.4. 자격증", key="myinfo_4")
@@ -62,7 +62,6 @@ answer = chain.invoke({"cominfo_1": cominfo_1, "cominfo_2": cominfo_2, "cominfo_
 
 # Button to generate the output
 if st.button("Generate 자기소개서"):
-    
     
     # Placeholder for the output
     st.header("자기소개서")
